@@ -1,0 +1,13 @@
+1. 先运行"Resistance_stockpile_策略_Vaccine_output_tocalculate_CEA.py"的最新系列 
+a. 输出"策略_Rxx_output_to_CEA_anti_n_vaccine_3month.csv"
+b. 输出"策略_Rxx_hospitalization_rates_matrix.csv"
+
+2. 运行"cost_effective.py"
+a. 输出"cost_analysis_策略_Rxx_output_to_CEA_anti_n_vaccine_3month"
+
+3. 运行"INMB_calculate.py" （可忽视，人工筛查：根据"cost_analysis_result_save.xlsx"，检查对齐，手动计算inmb）
+a. 输入"cost_analysis_策略_Rxx_output_to_CEA_anti_n_vaccine_3month"；输出"cost_analysis_策略_Rxx_output_to_CEA_anti_n_vaccine_3month"。（同名）
+
+4. "Plot_Heatmap_diff.R"
+
+5. "Plot_Bubble_Heatmap_diff.R"
