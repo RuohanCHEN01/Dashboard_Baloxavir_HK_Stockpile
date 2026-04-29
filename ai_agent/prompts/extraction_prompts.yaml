@@ -1,0 +1,45 @@
+# Literature Extraction Prompts
+extraction_prompts:
+  # Extract key epidemiological parameters from text
+  epidemiological_params: |
+    Extract the following parameters from the provided scientific text.
+    Report percentages as decimals (0.42 not 42%). Report costs in
+    their original currency unit.
+
+    Required parameters:
+    1. Vaccine efficacy (VE) with 95% CI if available
+    2. Antiviral resistance frequency/proportion
+    3. Serial interval (days)
+    4. Basic reproduction number (R0) range
+    5. Symptomatic proportion
+    6. Hospitalization rate
+    7. ICU admission rate
+    8. Case fatality rate (CFR)
+    9. Drug costs per treatment course
+
+    Confidence levels:
+    - "high": Directly reported primary data
+    - "medium": Meta-analysis or systematic review estimate
+    - "low": Model assumption or indirect estimate
+
+  # Extract cost-effectiveness results
+  cost_effectiveness: |
+    Extract cost-effectiveness analysis results:
+    1. ICER (Incremental Cost-Effectiveness Ratio)
+    2. NMB (Net Monetary Benefit)
+    3. QALYs gained
+    4. Total costs
+    5. WTP threshold used
+    6. Conclusion (cost-effective / dominated / not cost-effective)
+    7. Sensitivity analysis key drivers
+
+  # Extract drug-specific information
+  drug_properties: |
+    Extract drug-specific properties for antiviral agents:
+    1. Drug name and mechanism of action
+    2. Dosing regimen (frequency, duration)
+    3. Efficacy against influenza A/B
+    4. Resistance profile
+    5. Side effect profile
+    6. Cost per course
+    7. Approval status and age indications

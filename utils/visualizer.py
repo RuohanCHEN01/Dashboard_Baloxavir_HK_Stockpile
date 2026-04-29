@@ -1,6 +1,7 @@
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 
+
 class HeatmapVisualizer:
     def __init__(self, data, x_labels, y_labels, title='Heatmap'):
         self.data = data
@@ -13,6 +14,7 @@ class HeatmapVisualizer:
         fig.update_layout(title=self.title)
         fig.show()
 
+
 class BubbleChartVisualizer:
     def __init__(self, data, x, y, size, title='Bubble Chart'):
         self.data = data
@@ -23,13 +25,14 @@ class BubbleChartVisualizer:
 
     def plot(self):
         fig = go.Figure(data=go.Scatter(
-            x=self.data[self.x], 
-            y=self.data[self.y], 
+            x=self.data[self.x],
+            y=self.data[self.y],
             mode='markers',
             marker=dict(size=self.data[self.size]),
         ))
         fig.update_layout(title=self.title)
         fig.show()
+
 
 class KPIVisualizer:
     def __init__(self, kpi_value, kpi_label, title='KPI Card'):
@@ -44,6 +47,7 @@ class KPIVisualizer:
         ax.axis('off')
         plt.title(self.title)
         plt.show()
+
 
 class CostEffectivenessPlot:
     def __init__(self, costs, effectiveness, title='Cost-Effectiveness Plot'):
