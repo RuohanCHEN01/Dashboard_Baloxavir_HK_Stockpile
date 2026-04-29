@@ -225,6 +225,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 🙏 Acknowledgements
 
-- Supervisor: Prof. Benjamin Cowling & Dr. Z. Du (HKU SPH)
+- Supervisor: Prof. Benjamin Cowling & Prof. Z. Du
 - WHO Collaborating Centre for Infectious Disease Epidemiology and Control
-- Hong Kong pandemic modeling research group
+
