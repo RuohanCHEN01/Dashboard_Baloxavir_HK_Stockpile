@@ -32,64 +32,50 @@ st.set_page_config(
 # ---- Custom CSS ----
 st.markdown("""
 <style>
-    /* Root — pure black */
     html, body, iframe, .stApp {
-        background-color: #000000 !important;
-        color: #d1d5db;
+        background-color: #ffffff !important;
+        color: #1e293b;
     }
-    /* Main content area — black */
     .reportview-container .main .block-container {
-        background-color: #000000;
+        background-color: #ffffff;
         padding-top: 1.5rem;
     }
-    /* Sidebar — dark grey */
     section[data-testid="stSidebar"] {
-        background-color: #111111;
-        border-right: 1px solid #222222;
+        background-color: #f8fafc;
+        border-right: 1px solid #e2e8f0;
     }
     section[data-testid="stSidebar"] h1,
     section[data-testid="stSidebar"] h2,
     section[data-testid="stSidebar"] h3,
     section[data-testid="stSidebar"] p,
     section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] label { color: #e5e7eb; }
-    /* Headings — bright white for readability on black */
-    h1 { color: #ffffff; font-weight: 700; font-size: 1.8rem; }
-    h2 { color: #f3f4f6; font-weight: 600; font-size: 1.35rem; border-bottom: 1px solid #333333; padding-bottom: 0.3rem; }
-    h3 { color: #d1d5db; font-weight: 600; font-size: 1.1rem; }
-    /* Metric cards */
-    .stMetricLabel { color: #9ca3af; font-size: 0.85rem; font-weight: 500; }
-    .stMetricValue { color: #ffffff; font-weight: 700; font-size: 1.4rem; }
+    section[data-testid="stSidebar"] label { color: #1e293b; }
+    h1 { color: #0f172a; font-weight: 700; font-size: 1.8rem; }
+    h2 { color: #1e293b; font-weight: 600; font-size: 1.35rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3rem; }
+    h3 { color: #334155; font-weight: 600; font-size: 1.1rem; }
+    .stMetricLabel { color: #475569; font-size: 0.85rem; font-weight: 500; }
+    .stMetricValue { color: #0f172a; font-weight: 700; font-size: 1.4rem; }
     div[data-testid="stMetric"] {
-        background-color: #111111;
+        background-color: #f8fafc;
         border-radius: 0.75rem;
         padding: 1rem;
-        border: 1px solid #222222;
+        border: 1px solid #e2e8f0;
     }
-    /* Dataframes */
-    div.stDataFrame { border-radius: 0.75rem; border: 1px solid #222222; }
-    /* Body text */
-    p, span, label { color: #d1d5db; }
-    /* Figure captions */
-    .figure-caption { color: #6b7280; font-size: 0.85rem; font-style: italic; margin-top: 0.5rem; text-align: center; }
-    /* AI badge */
+    div.stDataFrame { border-radius: 0.75rem; border: 1px solid #e2e8f0; }
+    p, span, label { color: #334155; }
+    .figure-caption { color: #64748b; font-size: 0.85rem; font-style: italic; margin-top: 0.5rem; text-align: center; }
     .ai-badge { display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; vertical-align: middle; margin-left: 6px; }
-    /* Expander */
-    .streamlit-expanderHeader { background-color: #111111; border-radius: 0.5rem; color: #e5e7eb; }
-    /* Selectbox / multiselect */
+    .streamlit-expanderHeader { background-color: #f1f5f9; border-radius: 0.5rem; color: #1e293b; }
     .stSelectbox > div > div,
-    .stMultiSelect > div > div { background-color: #111111; border-color: #222222; color: #d1d5db; }
-    /* Nav radio — highlight selected */
+    .stMultiSelect > div > div { background-color: #ffffff; border-color: #e2e8f0; }
     .stRadio label[aria-selected="true"] {
-        background-color: #1e3a5f;
-        color: #60a5fa;
+        background-color: #dbeafe;
+        color: #1e40af;
         border-radius: 0.4rem;
         font-weight: 600;
     }
-    .stRadio label { border-radius: 0.4rem; padding: 0.25rem 0.5rem; color: #d1d5db; }
-    a { color: #60a5fa; }
-    /* Slider track */
-    .stSlider > div > div > div > div { background-color: #222222; }
+    .stRadio label { border-radius: 0.4rem; padding: 0.25rem 0.5rem; }
+    a { color: #3b82f6; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -201,16 +187,16 @@ df_cea.columns = [c.strip() for c in df_cea.columns]
 df_output.columns = [c.strip() for c in df_output.columns]
 
 
-# ---- Plotly Theme (black background) ----
+# ---- Plotly Theme (white background) ----
 PLOTLY_THEME = dict(
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(17,17,17,1)",
-    font=dict(color="#d1d5db", family="-apple-system, sans-serif", size=12),
-    xaxis=dict(gridcolor="#222222", zerolinecolor="#333333"),
-    yaxis=dict(gridcolor="#222222", zerolinecolor="#333333"),
+    paper_bgcolor="rgba(255,255,255,1)",
+    plot_bgcolor="rgba(248,250,252,1)",
+    font=dict(color="#475569", family="-apple-system, sans-serif", size=12),
+    xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
+    yaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
     margin=dict(t=50, r=30, b=50, l=70),
     colorway=["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"],
-    legend=dict(font=dict(color="#d1d5db"), orientation="h", y=-0.25),
+    legend=dict(font=dict(color="#475569"), orientation="h", y=-0.25),
 )
 
 
