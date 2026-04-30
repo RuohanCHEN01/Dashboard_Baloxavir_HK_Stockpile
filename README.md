@@ -160,7 +160,7 @@ The `ai_agent/` module provides a unified interface to multiple LLM providers:
 from ai_agent import LLMClient, LiteratureExtractor
 
 # Initialize with any supported provider
-client = LLMClient(provider="mimo", model="MiMo-V2.5-Pro")
+client = LLMClient(provider="mimo", model="mimo-v2.5-pro")
 
 # Extract epidemiological parameters from a PubMed abstract
 extractor = LiteratureExtractor(client)

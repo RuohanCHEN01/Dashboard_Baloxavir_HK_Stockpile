@@ -27,7 +27,7 @@ ai_agent/
 from ai_agent import LLMClient
 
 # Use MiMo (1M context window)
-client = LLMClient(provider="mimo", model="MiMo-V2.5-Pro")
+client = LLMClient(provider="mimo", model="mimo-v2.5-pro")
 
 # Use OpenAI
 client = LLMClient(provider="openai", model="gpt-4o")

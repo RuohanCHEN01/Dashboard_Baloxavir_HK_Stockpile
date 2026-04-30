@@ -471,7 +471,7 @@ elif page == "AI Agent Demo":
         st.code("""from ai_agent import LLMClient
 
 # Use MiMo (1M context window)
-client = LLMClient(provider="mimo", model="MiMo-V2.5-Pro")
+client = LLMClient(provider="mimo", model="mimo-v2.5-pro")
 response = client.complete([
     {"role": "user", "content": "Analyze BXM stockpile strategy..."}
 ])

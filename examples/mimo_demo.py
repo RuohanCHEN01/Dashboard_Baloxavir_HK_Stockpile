@@ -24,7 +24,7 @@ def demo_mimo_extraction():
     # API keys are loaded from MIMO_API_KEY environment variable automatically
     client = LLMClient(
         provider="mimo",
-        model="MiMo-V2.5-Pro",   # 1M context window
+        model="mimo-v2.5-pro",   # 1M context window
         temperature=0.1,          # Low temperature for factual extraction
     )
 
@@ -94,7 +94,7 @@ def demo_mimo_extraction():
 def demo_mimo_nl_query():
     """Demo: Query scenario results using natural language with MiMo."""
 
-    client = LLMClient(provider="mimo", model="MiMo-V2.5-Pro")
+    client = LLMClient(provider="mimo", model="mimo-v2.5-pro")
     engine = NLQueryEngine(client)
 
     # Load sample scenario results
@@ -150,7 +150,7 @@ def demo_mimo_nl_query():
 def demo_mimo_report():
     """Demo: Generate policy brief section using MiMo."""
 
-    client = LLMClient(provider="mimo", model="MiMo-V2.5-Pro")
+    client = LLMClient(provider="mimo", model="mimo-v2.5-pro")
     generator = PolicyReportGenerator(client)
 
     analysis_data = {

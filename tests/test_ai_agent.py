@@ -1,8 +1,8 @@
 """Tests for AI Agent module."""
 
 import pytest
-from unittest.mock import MagicMock, patch
-from ai_agent.llm_interface import LLMClient, PROVIDER_REGISTRY, MODEL_ALIASES
+from unittest.mock import MagicMock
+from ai_agent.llm_interface import LLMClient, PROVIDER_REGISTRY
 from ai_agent.literature_extractor import LiteratureExtractor, ExtractedParams
 from ai_agent.nl_query import NLQueryEngine
 from ai_agent.report_generator import PolicyReportGenerator
@@ -26,7 +26,7 @@ class TestLLMClient:
         client = LLMClient(provider="mimo")
         info = client.info
         assert info["provider"] == "mimo"
-        assert info["model"] == "MiMo-V2.5-Pro"
+        assert info["model"] == "mimo-v2.5-pro"
         assert info["context_window"] == 1_000_000
         assert info["supports_vision"] is True
 

@@ -1,8 +1,6 @@
 """Tests for utility modules."""
 
-import pytest
 import pandas as pd
-from io import StringIO
 from utils.data_processor import DataProcessor
 from utils.visualizer import HeatmapVisualizer, BubbleChartVisualizer, CostEffectivenessPlot
 

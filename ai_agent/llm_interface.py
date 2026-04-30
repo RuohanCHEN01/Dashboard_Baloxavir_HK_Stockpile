@@ -42,7 +42,7 @@ PROVIDER_REGISTRY = {
     ),
     "mimo": ProviderConfig(
         base_url="https://api.xiaomimimo.com/v1",
-        default_model="MiMo-V2.5-Pro",
+        default_model="mimo-v2.5-pro",
         context_window=1_000_000,
         supports_vision=True,
         supports_structured_output=True,
@@ -64,6 +64,7 @@ MODEL_ALIASES = {
     "claude-3-opus": "claude",
     "mimo-v2.5-pro": "mimo",
     "mimo-v2.5": "mimo",
+    "mimo-v2-pro": "mimo",
     "mimo-v2-flash": "mimo",
     "deepseek-v3": "deepseek",
     "deepseek-r1": "deepseek",
