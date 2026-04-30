@@ -32,73 +32,62 @@ st.set_page_config(
 # ---- Custom CSS ----
 st.markdown("""
 <style>
-    /* Root HTML/iframe — white background (outermost) */
+    /* Root — dark background */
     html, body, iframe, .stApp {
-        background-color: #ffffff !important;
-        color: #1e293b;
+        background-color: #0f172a !important;
+        color: #e2e8f0;
     }
-    /* Main content area */
+    /* Main content area — dark */
     .reportview-container .main .block-container {
-        background-color: #ffffff;
+        background-color: #0f172a;
         padding-top: 1.5rem;
     }
-    /* Sidebar — light grey */
+    /* Sidebar — slightly lighter dark */
     section[data-testid="stSidebar"] {
-        background-color: #f1f5f9;
-        border-right: 1px solid #e2e8f0;
+        background-color: #1e293b;
+        border-right: 1px solid #334155;
     }
     section[data-testid="stSidebar"] h1,
     section[data-testid="stSidebar"] h2,
     section[data-testid="stSidebar"] h3,
     section[data-testid="stSidebar"] p,
     section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] label { color: #1e293b; }
-    /* Main content headings — high contrast */
-    h1 {
-        color: #0f172a;
-        font-weight: 700;
-        font-size: 1.8rem;
-    }
-    h2 {
-        color: #1e293b;
-        font-weight: 600;
-        font-size: 1.35rem;
-        border-bottom: 2px solid #e2e8f0;
-        padding-bottom: 0.3rem;
-    }
-    h3 { color: #334155; font-weight: 600; font-size: 1.1rem; }
+    section[data-testid="stSidebar"] label { color: #e2e8f0; }
+    /* Headings — light text on dark */
+    h1 { color: #f1f5f9; font-weight: 700; font-size: 1.8rem; }
+    h2 { color: #e2e8f0; font-weight: 600; font-size: 1.35rem; border-bottom: 2px solid #334155; padding-bottom: 0.3rem; }
+    h3 { color: #cbd5e1; font-weight: 600; font-size: 1.1rem; }
     /* Metric cards */
-    .stMetricLabel { color: #475569; font-size: 0.85rem; font-weight: 500; }
-    .stMetricValue { color: #0f172a; font-weight: 700; font-size: 1.4rem; }
+    .stMetricLabel { color: #94a3b8; font-size: 0.85rem; font-weight: 500; }
+    .stMetricValue { color: #f1f5f9; font-weight: 700; font-size: 1.4rem; }
     div[data-testid="stMetric"] {
-        background-color: #f8fafc;
+        background-color: #1e293b;
         border-radius: 0.75rem;
         padding: 1rem;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        border: 1px solid #334155;
     }
     /* Dataframes */
-    div.stDataFrame { border-radius: 0.75rem; border: 1px solid #e2e8f0; }
+    div.stDataFrame { border-radius: 0.75rem; }
     /* Body text */
-    p, span, label { color: #334155; }
+    p, span, label { color: #cbd5e1; }
     /* Figure captions */
-    .figure-caption { color: #64748b; font-size: 0.85rem; font-style: italic; margin-top: 0.5rem; text-align: center; }
+    .figure-caption { color: #94a3b8; font-size: 0.85rem; font-style: italic; margin-top: 0.5rem; text-align: center; }
     /* AI badge */
     .ai-badge { display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; vertical-align: middle; margin-left: 6px; }
     /* Expander */
-    .streamlit-expanderHeader { background-color: #f1f5f9; border-radius: 0.5rem; color: #1e293b; }
+    .streamlit-expanderHeader { background-color: #1e293b; border-radius: 0.5rem; color: #e2e8f0; }
     /* Selectbox / multiselect */
     .stSelectbox > div > div,
-    .stMultiSelect > div > div { background-color: #ffffff; border-color: #e2e8f0; }
+    .stMultiSelect > div > div { background-color: #1e293b; border-color: #334155; }
     /* Nav radio — highlight selected */
     .stRadio label[aria-selected="true"] {
-        background-color: #dbeafe;
-        color: #1e40af;
+        background-color: #1e3a5f;
+        color: #60a5fa;
         border-radius: 0.4rem;
         font-weight: 600;
     }
     .stRadio label { border-radius: 0.4rem; padding: 0.25rem 0.5rem; }
-    a { color: #3b82f6; }
+    a { color: #60a5fa; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -210,16 +199,16 @@ df_cea.columns = [c.strip() for c in df_cea.columns]
 df_output.columns = [c.strip() for c in df_output.columns]
 
 
-# ---- Plotly Theme (light background) ----
+# ---- Plotly Theme (dark background) ----
 PLOTLY_THEME = dict(
-    paper_bgcolor="rgba(255,255,255,1)",
-    plot_bgcolor="rgba(248,250,252,1)",
-    font=dict(color="#475569", family="-apple-system, sans-serif", size=12),
-    xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
-    yaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
+    paper_bgcolor="rgba(15,23,42,1)",
+    plot_bgcolor="rgba(15,23,42,1)",
+    font=dict(color="#94a3b8", family="-apple-system, sans-serif", size=12),
+    xaxis=dict(gridcolor="#1e293b", zerolinecolor="#334155"),
+    yaxis=dict(gridcolor="#1e293b", zerolinecolor="#334155"),
     margin=dict(t=50, r=30, b=50, l=70),
     colorway=["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"],
-    legend=dict(font=dict(color="#475569"), orientation="h", y=-0.25),
+    legend=dict(font=dict(color="#94a3b8"), orientation="h", y=-0.25),
 )
 
 
@@ -659,7 +648,7 @@ elif page == "Hospitalization (Fig 4)":
         '<p class="figure-caption">'
         'Green curve: current baseline (90% OTV + 10% ZNV, 40% random). '
         'Orange/blue/red curves: BXM-supplementary strategies. '
-        'Dashed lines: Hong Kong capacity thresholds (100%, 120%, 140%).'
+        'Dashed lines: Hong Kong capacity thresholds (140%, 160%).'
         '</p>',
         unsafe_allow_html=True,
     )
@@ -729,12 +718,10 @@ elif page == "Hospitalization (Fig 4)":
                     line=dict(color=colors[i % len(colors)], width=2.5),
                     hovertemplate="Day %{x}: %{y:.4f}<extra></extra>",
                 ))
-            fig_hosp.add_hline(y=1.0, line_dash="dot", line_color="#10b981",
-                               annotation_text="100% capacity")
-            fig_hosp.add_hline(y=1.2, line_dash="dot", line_color="#f59e0b",
-                               annotation_text="120% capacity")
-            fig_hosp.add_hline(y=1.4, line_dash="dot", line_color="#ef4444",
-                               annotation_text="140% collapse")
+            fig_hosp.add_hline(y=1.4, line_dash="dot", line_color="#f59e0b",
+                               annotation_text="140% capacity")
+            fig_hosp.add_hline(y=1.6, line_dash="dot", line_color="#ef4444",
+                               annotation_text="160% collapse")
             fig_hosp.update_layout(
                 **PLOTLY_THEME,
                 xaxis_title="Day (post-pandemic onset)",
