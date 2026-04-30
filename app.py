@@ -32,16 +32,18 @@ st.set_page_config(
 # ---- Custom CSS ----
 st.markdown("""
 <style>
-    html, body, iframe, .stApp {
+    /* Root + all layers — pure white */
+    html, body, iframe, .stApp,
+    [data-testid="stHeader"],
+    [data-testid="stToolbar"],
+    .reportview-container,
+    .reportview-container .main .block-container {
         background-color: #ffffff !important;
         color: #1e293b;
     }
-    .reportview-container .main .block-container {
-        background-color: #ffffff;
-        padding-top: 1.5rem;
-    }
+    /* Sidebar */
     section[data-testid="stSidebar"] {
-        background-color: #f8fafc;
+        background-color: #ffffff;
         border-right: 1px solid #e2e8f0;
     }
     section[data-testid="stSidebar"] h1,
@@ -50,24 +52,37 @@ st.markdown("""
     section[data-testid="stSidebar"] p,
     section[data-testid="stSidebar"] span,
     section[data-testid="stSidebar"] label { color: #1e293b; }
+    /* Headings */
     h1 { color: #0f172a; font-weight: 700; font-size: 1.8rem; }
     h2 { color: #1e293b; font-weight: 600; font-size: 1.35rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3rem; }
     h3 { color: #334155; font-weight: 600; font-size: 1.1rem; }
+    /* Metric cards */
     .stMetricLabel { color: #475569; font-size: 0.85rem; font-weight: 500; }
     .stMetricValue { color: #0f172a; font-weight: 700; font-size: 1.4rem; }
     div[data-testid="stMetric"] {
-        background-color: #f8fafc;
+        background-color: #ffffff;
         border-radius: 0.75rem;
         padding: 1rem;
         border: 1px solid #e2e8f0;
     }
+    /* Dataframes — white background + dark text */
     div.stDataFrame { border-radius: 0.75rem; border: 1px solid #e2e8f0; }
+    div.stDataFrame table { background-color: #ffffff; color: #1e293b; }
+    div.stDataFrame th { background-color: #f1f5f9; color: #0f172a; }
+    div.stDataFrame td { background-color: #ffffff; color: #1e293b; }
+    div.stDataFrame tr:hover td { background-color: #f8fafc; }
+    /* Body text */
     p, span, label { color: #334155; }
     .figure-caption { color: #64748b; font-size: 0.85rem; font-style: italic; margin-top: 0.5rem; text-align: center; }
+    /* AI badge */
     .ai-badge { display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; vertical-align: middle; margin-left: 6px; }
-    .streamlit-expanderHeader { background-color: #f1f5f9; border-radius: 0.5rem; color: #1e293b; }
+    /* Expander — white */
+    .streamlit-expanderHeader { background-color: #ffffff; border-radius: 0.5rem; color: #1e293b; border: 1px solid #e2e8f0; }
+    div[data-testid="stExpander"] { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.5rem; }
+    /* Selectbox / multiselect */
     .stSelectbox > div > div,
     .stMultiSelect > div > div { background-color: #ffffff; border-color: #e2e8f0; }
+    /* Nav radio */
     .stRadio label[aria-selected="true"] {
         background-color: #dbeafe;
         color: #1e40af;
@@ -76,6 +91,19 @@ st.markdown("""
     }
     .stRadio label { border-radius: 0.4rem; padding: 0.25rem 0.5rem; }
     a { color: #3b82f6; }
+    /* Tabs — white */
+    .stTabs [data-baseweb="tab-list"] { background-color: #ffffff; }
+    .stTabs [data-baseweb="tab"] { color: #334155; }
+    .stTabs [aria-selected="true"] { color: #1e40af; }
+    /* Info / success / warning / error boxes */
+    .stAlert { background-color: #ffffff; border-radius: 0.5rem; color: #1e293b; }
+    /* Code blocks */
+    .stCodeBlock { background-color: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0; }
+    pre, code { color: #1e293b; }
+    /* Slider */
+    .stSlider [data-baseweb="slider"] { background-color: #e2e8f0; }
+    /* Divider */
+    hr, .stDivider { border-color: #e2e8f0; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -215,15 +243,15 @@ AI_INSIGHTS = {
 
 
 def ai_insight_card(title: str, content: str) -> str:
-    """Return HTML for an AI insight card."""
+    """Return HTML for an AI insight card (white background)."""
     return (
-        f'<div style="background:linear-gradient(135deg,#1e1b4b,#172554); '
-        f'border:1px solid #3b82f6; border-radius:0.75rem; padding:1rem; margin-bottom:0.6rem;">'
+        f'<div style="background:#ffffff; '
+        f'border:1px solid #e2e8f0; border-left:3px solid #3b82f6; border-radius:0.75rem; padding:1rem; margin-bottom:0.6rem;">'
         f'<div style="display:flex;align-items:center;gap:6px;margin-bottom:0.4rem;">'
         f'<span class="ai-badge">AI</span>'
-        f'<span style="font-weight:600;color:#e2e8f0;font-size:0.9rem;">{title}</span>'
+        f'<span style="font-weight:600;color:#0f172a;font-size:0.9rem;">{title}</span>'
         f'</div>'
-        f'<div style="font-size:0.85rem;color:#94a3b8;line-height:1.5;">{content}</div>'
+        f'<div style="font-size:0.85rem;color:#334155;line-height:1.5;">{content}</div>'
         f'</div>'
     )
 
@@ -479,7 +507,7 @@ elif page == "Transmission (Table 1 & Fig 2)":
                     z=pivot_rar.values,
                     x=[f"{v*100:.0f}%" for v in pivot_rar.columns],
                     y=[f"{v*100:.0f}%" for v in pivot_rar.index],
-                    colorscale=[[0, "#1e293b"], [0.5, "#f59e0b"], [1, "#ef4444"]],
+                    colorscale=[[0, "#dbeafe"], [0.5, "#f59e0b"], [1, "#ef4444"]],
                     hovertemplate="BXM: %{y}, OTV: %{x}<br>RAR: %{z:.4f}<extra></extra>",
                 ))
                 fig_rar.update_layout(**PLOTLY_THEME, xaxis_title="OTV %", yaxis_title="BXM %")
@@ -581,7 +609,7 @@ elif page == "Cost-Effectiveness (Table 2 & Fig 3)":
             **PLOTLY_THEME,
             xaxis_title="Incremental Cost (HKD)",
             yaxis_title="Incremental QALY",
-            title=dict(text="vs OTV-only Baseline", font=dict(size=13, color="#e2e8f0")),
+            title=dict(text="vs OTV-only Baseline", font=dict(size=13, color="#1e293b")),
         )
         st.plotly_chart(fig_ce, use_container_width=True)
     else:
