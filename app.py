@@ -32,15 +32,28 @@ st.set_page_config(
 # ---- Custom CSS ----
 st.markdown("""
 <style>
-    .main .block-container { padding-top: 1.5rem; }
-    section[data-testid="stSidebar"] { background-color: #0f172a; }
-    h1, h2, h3 { color: #e2e8f0; }
-    .stMetricLabel { color: #94a3b8; font-size: 0.85rem; }
-    .stMetricValue { color: #f1f5f9; }
-    div[data-testid="stMetric"] { background-color: #1e293b; border-radius: 0.75rem; padding: 1rem; border: 1px solid #334155; }
-    div.stDataFrame { border-radius: 0.75rem; }
-    .figure-caption { color: #94a3b8; font-size: 0.85rem; font-style: italic; margin-top: 0.5rem; text-align: center; }
+    /* White background theme */
+    .reportview-container .main .block-container { background-color: #ffffff; padding-top: 1.5rem; }
+    section[data-testid="stSidebar"] { background-color: #1e293b; }
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] label { color: #e2e8f0; }
+    h1, h2, h3 { color: #1e293b; }
+    .stMetricLabel { color: #475569; font-size: 0.85rem; }
+    .stMetricValue { color: #1e293b; }
+    div[data-testid="stMetric"] { background-color: #f8fafc; border-radius: 0.75rem; padding: 1rem; border: 1px solid #e2e8f0; }
+    div.stDataFrame { border-radius: 0.75rem; border: 1px solid #e2e8f0; }
+    .figure-caption { color: #475569; font-size: 0.85rem; font-style: italic; margin-top: 0.5rem; text-align: center; }
     .ai-badge { display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; vertical-align: middle; margin-left: 6px; }
+    /* White expander headers */
+    .streamlit-expanderHeader { background-color: #f1f5f9; border-radius: 0.5rem; }
+    /* White selectbox/dropdown */
+    .stSelectbox > div > div { background-color: #ffffff; }
+    /* White multiselect chips */
+    .stMultiSelect > div > div { background-color: #ffffff; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -152,16 +165,16 @@ df_cea.columns = [c.strip() for c in df_cea.columns]
 df_output.columns = [c.strip() for c in df_output.columns]
 
 
-# ---- Plotly Theme ----
+# ---- Plotly Theme (light background) ----
 PLOTLY_THEME = dict(
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(color="#94a3b8", family="-apple-system, sans-serif", size=12),
-    xaxis=dict(gridcolor="#1e293b", zerolinecolor="#334155"),
-    yaxis=dict(gridcolor="#1e293b", zerolinecolor="#334155"),
+    paper_bgcolor="rgba(255,255,255,1)",
+    plot_bgcolor="rgba(248,250,252,1)",
+    font=dict(color="#475569", family="-apple-system, sans-serif", size=12),
+    xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
+    yaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
     margin=dict(t=50, r=30, b=50, l=70),
     colorway=["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"],
-    legend=dict(font=dict(color="#94a3b8"), orientation="h", y=-0.25),
+    legend=dict(font=dict(color="#475569"), orientation="h", y=-0.25),
 )
 
 
@@ -572,6 +585,18 @@ elif page == "Hospitalization (Fig 4)":
     st.title("Public Hospital Ward Demand")
     st.caption("Daily occupancy during pandemic — Figure 4")
 
+    # Stockpile Filters at top (mirrors sidebar display)
+    st.markdown("---")
+    st.markdown("#### Stockpile Filters")
+    filt_col1, filt_col2, filt_col3 = st.columns(3)
+    with filt_col1:
+        st.metric("BXM Proportion", f"{bxm_min}% – {bxm_max}%")
+    with filt_col2:
+        st.metric("OTV Proportion", f"{otv_min}% – {otv_max}%")
+    with filt_col3:
+        st.metric("ZNV Proportion", znv_display)
+    st.caption(f"Filtered: {n_t1} Table 1 rows | {n_t2} Table 2 rows | {n_sim} simulation scenarios")
+
     # AI Insight
     with st.expander('AI Analysis <span class="ai-badge">MiMo</span>', expanded=True):
         st.markdown(ai_insight_card(
@@ -594,55 +619,85 @@ elif page == "Hospitalization (Fig 4)":
         unsafe_allow_html=True,
     )
 
-    # Interactive simulation time series
+    # Interactive simulation time series — automatically filtered by Stockpile Filters
     st.markdown("### Interactive: Hospitalization Rate Time Series")
-    st.caption("500-day simulation from the model")
+    st.caption("500-day simulation from the model — automatically filtered by Stockpile Filters above")
 
+    # Build a long-format dataset from hospitalization CSV for filtering
     hosp_cols = [c for c in df_hosp.columns if c != "Day"]
-    scenario_labels = {
+
+    # Parse BXM/OTV proportions from column names like "0.0bxm_0.0otv_1.0znv"
+    hosp_long_list = []
+    for col in hosp_cols:
+        parts = col.split("_")
+        bxm_p = otv_p = None
+        for p in parts:
+            if "bxm" in p:
+                bxm_p = float(p.replace("bxm", "")) * 100
+            if "otv" in p:
+                otv_p = float(p.replace("otv", "")) * 100
+        if bxm_p is not None and otv_p is not None:
+            hosp_long_list.append({"scenario_col": col, "BXM_proportion": bxm_p, "OTV_proportion": otv_p})
+    hosp_lookup = pd.DataFrame(hosp_long_list)
+
+    # Apply Stockpile Filters to hospitalization scenarios
+    hosp_filtered = hosp_lookup[
+        (hosp_lookup["BXM_proportion"] >= bxm_min) &
+        (hosp_lookup["BXM_proportion"] <= bxm_max) &
+        (hosp_lookup["OTV_proportion"] >= otv_min) &
+        (hosp_lookup["OTV_proportion"] <= otv_max)
+    ]
+
+    scenario_labels_map = {
         "0.0bxm_0.0otv_1.0znv": "ZNV 100%",
         "0.0bxm_1.0otv_0.0znv": "OTV 100%",
         "0.5bxm_0.0otv_0.5znv": "BXM 50% + ZNV 50%",
         "0.5bxm_0.5otv_0.0znv": "BXM 50% + OTV 50%",
         "1.0bxm_0.0otv_0.0znv": "BXM 100%",
     }
-    available = [c for c in scenario_labels if c in hosp_cols]
+    available = [c for c in scenario_labels_map if c in hosp_cols]
 
-    selected_labels = st.multiselect(
-        "Select scenarios to compare",
-        options=list(scenario_labels.values()),
-        default=[scenario_labels[c] for c in available[:3] if c in available],
-    )
-    label_to_col = {v: k for k, v in scenario_labels.items()}
-    selected_cols = [label_to_col[label] for label in selected_labels if label_to_col[label] in hosp_cols]
-
-    if selected_cols:
-        fig_hosp = go.Figure()
-        colors = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"]
-        for i, col in enumerate(selected_cols):
-            display_name = scenario_labels.get(col, col)
-            fig_hosp.add_trace(go.Scatter(
-                x=df_hosp["Day"],
-                y=df_hosp[col],
-                mode="lines",
-                name=display_name,
-                line=dict(color=colors[i % len(colors)], width=2.5),
-                hovertemplate="Day %{x}: %{y:.4f}<extra></extra>",
-            ))
-        fig_hosp.add_hline(y=1.0, line_dash="dot", line_color="#10b981",
-                           annotation_text="100% capacity")
-        fig_hosp.add_hline(y=1.2, line_dash="dot", line_color="#f59e0b",
-                           annotation_text="120% capacity")
-        fig_hosp.add_hline(y=1.4, line_dash="dot", line_color="#ef4444",
-                           annotation_text="140% collapse")
-        fig_hosp.update_layout(
-            **PLOTLY_THEME,
-            xaxis_title="Day (post-pandemic onset)",
-            yaxis_title="Hospitalization Rate",
-        )
-        st.plotly_chart(fig_hosp, use_container_width=True)
+    if len(hosp_filtered) == 0:
+        st.warning("No hospitalization scenarios match the current Stockpile Filters. "
+                   "Please adjust BXM/OTV proportion in the sidebar.")
     else:
-        st.info("Select at least one scenario to display.")
+        # Present as a multiselect among filtered scenarios
+        filtered_scenario_labels = [scenario_labels_map.get(c, c) for c in hosp_filtered["scenario_col"]]
+        selected_labels = st.multiselect(
+            "Select scenarios to compare",
+            options=filtered_scenario_labels,
+            default=filtered_scenario_labels[:min(3, len(filtered_scenario_labels))],
+        )
+        label_to_col = {v: k for k, v in scenario_labels_map.items()}
+        selected_cols = [label_to_col[label] for label in selected_labels if label in label_to_col]
+
+        if selected_cols:
+            fig_hosp = go.Figure()
+            colors = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"]
+            for i, col in enumerate(selected_cols):
+                display_name = scenario_labels_map.get(col, col)
+                fig_hosp.add_trace(go.Scatter(
+                    x=df_hosp["Day"],
+                    y=df_hosp[col],
+                    mode="lines",
+                    name=display_name,
+                    line=dict(color=colors[i % len(colors)], width=2.5),
+                    hovertemplate="Day %{x}: %{y:.4f}<extra></extra>",
+                ))
+            fig_hosp.add_hline(y=1.0, line_dash="dot", line_color="#10b981",
+                               annotation_text="100% capacity")
+            fig_hosp.add_hline(y=1.2, line_dash="dot", line_color="#f59e0b",
+                               annotation_text="120% capacity")
+            fig_hosp.add_hline(y=1.4, line_dash="dot", line_color="#ef4444",
+                               annotation_text="140% collapse")
+            fig_hosp.update_layout(
+                **PLOTLY_THEME,
+                xaxis_title="Day (post-pandemic onset)",
+                yaxis_title="Hospitalization Rate",
+            )
+            st.plotly_chart(fig_hosp, use_container_width=True)
+        else:
+            st.info("Select at least one scenario to display.")
 
 
 # ============================================================
