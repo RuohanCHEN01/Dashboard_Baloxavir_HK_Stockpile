@@ -32,28 +32,73 @@ st.set_page_config(
 # ---- Custom CSS ----
 st.markdown("""
 <style>
-    /* White background theme */
-    .reportview-container .main .block-container { background-color: #ffffff; padding-top: 1.5rem; }
-    section[data-testid="stSidebar"] { background-color: #1e293b; }
+    /* Root HTML/iframe — white background (outermost) */
+    html, body, iframe, .stApp {
+        background-color: #ffffff !important;
+        color: #1e293b;
+    }
+    /* Main content area */
+    .reportview-container .main .block-container {
+        background-color: #ffffff;
+        padding-top: 1.5rem;
+    }
+    /* Sidebar — light grey */
+    section[data-testid="stSidebar"] {
+        background-color: #f1f5f9;
+        border-right: 1px solid #e2e8f0;
+    }
     section[data-testid="stSidebar"] h1,
     section[data-testid="stSidebar"] h2,
     section[data-testid="stSidebar"] h3,
     section[data-testid="stSidebar"] p,
     section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] label { color: #e2e8f0; }
-    h1, h2, h3 { color: #1e293b; }
-    .stMetricLabel { color: #475569; font-size: 0.85rem; }
-    .stMetricValue { color: #1e293b; }
-    div[data-testid="stMetric"] { background-color: #f8fafc; border-radius: 0.75rem; padding: 1rem; border: 1px solid #e2e8f0; }
+    section[data-testid="stSidebar"] label { color: #1e293b; }
+    /* Main content headings — high contrast */
+    h1 {
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 1.8rem;
+    }
+    h2 {
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 1.35rem;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.3rem;
+    }
+    h3 { color: #334155; font-weight: 600; font-size: 1.1rem; }
+    /* Metric cards */
+    .stMetricLabel { color: #475569; font-size: 0.85rem; font-weight: 500; }
+    .stMetricValue { color: #0f172a; font-weight: 700; font-size: 1.4rem; }
+    div[data-testid="stMetric"] {
+        background-color: #f8fafc;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    /* Dataframes */
     div.stDataFrame { border-radius: 0.75rem; border: 1px solid #e2e8f0; }
-    .figure-caption { color: #475569; font-size: 0.85rem; font-style: italic; margin-top: 0.5rem; text-align: center; }
+    /* Body text */
+    p, span, label { color: #334155; }
+    /* Figure captions */
+    .figure-caption { color: #64748b; font-size: 0.85rem; font-style: italic; margin-top: 0.5rem; text-align: center; }
+    /* AI badge */
     .ai-badge { display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; vertical-align: middle; margin-left: 6px; }
-    /* White expander headers */
-    .streamlit-expanderHeader { background-color: #f1f5f9; border-radius: 0.5rem; }
-    /* White selectbox/dropdown */
-    .stSelectbox > div > div { background-color: #ffffff; }
-    /* White multiselect chips */
-    .stMultiSelect > div > div { background-color: #ffffff; }
+    /* Expander */
+    .streamlit-expanderHeader { background-color: #f1f5f9; border-radius: 0.5rem; color: #1e293b; }
+    /* Selectbox / multiselect */
+    .stSelectbox > div > div,
+    .stMultiSelect > div > div { background-color: #ffffff; border-color: #e2e8f0; }
+    /* Nav radio — highlight selected */
+    .stRadio label[aria-selected="true"] {
+        background-color: #dbeafe;
+        color: #1e40af;
+        border-radius: 0.4rem;
+        font-weight: 600;
+    }
+    .stRadio label { border-radius: 0.4rem; padding: 0.25rem 0.5rem; }
+    a { color: #3b82f6; }
 </style>
 """, unsafe_allow_html=True)
 
