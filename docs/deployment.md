@@ -1,5 +1,11 @@
 # Streamlit Cloud Deployment Guide
 
+## 🔗 Live Deployment
+
+The dashboard is deployed at:
+
+**https://dashboardbaloxavirhkstockpile-7r4ydhrwws9erayhwprou6.streamlit.app/**
+
 ## Deploy to Streamlit Community Cloud
 
 ### Prerequisites

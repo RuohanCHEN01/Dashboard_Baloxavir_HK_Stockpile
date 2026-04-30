@@ -8,6 +8,7 @@
 ![Agent](https://img.shields.io/badge/Architecture-Agent_Workflow-8B5CF6.svg)
 ![License](https://img.shields.io/badge/License-MIT-F59E0B.svg)
 ![Research](https://img.shields.io/badge/HKU-WHO_CC_Research-DC2626.svg)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Streamlit_Cloud-FF4B4B.svg)](https://dashboardbaloxavirhkstockpile-7r4ydhrwws9erayhwprou6.streamlit.app/)
 
 ---
 
@@ -186,7 +187,7 @@ params = extractor.extract("Background: Influenza vaccine effectiveness was esti
 - [x] ~~Data Visualization~~ — Plotly interactive charts
 - [x] **AI Agent Module** — LLM-powered analysis features *(v2.0)*
 - [x] **CI/CD Pipeline** — GitHub Actions automated testing
-- [ ] **Streamlit Cloud Deployment** — Public online demo
+- [x] **Streamlit Cloud Deployment** — Public online demo ([Launch](https://dashboardbaloxavirhkstockpile-7r4ydhrwws9erayhwprou6.streamlit.app/))
 - [ ] **Natural Language Query** — Ask questions about results in plain language
 - [ ] **Automated Report Generation** — One-click PDF policy briefs
 - [ ] **Docker Containerization** — One-command deployment
