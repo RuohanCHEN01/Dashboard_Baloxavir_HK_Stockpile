@@ -1,11 +1,3 @@
-[general]
-email = "ruohan0@connect.hku.hk"
-
-[browser]
-gatherUsageStats = false
-serverAddress = "0.0.0.0"
-serverHeadless = true
-
 [server]
 port = 8501
 headless = true
@@ -14,8 +6,8 @@ enableXsrfProtection = false
 maxUploadSize = 50
 
 [theme]
-primaryColor = "#1E3A5F"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F5F7FA"
-textColor = "#1E293B"
+primaryColor = "#3b82f6"
+backgroundColor = "#0f172a"
+secondaryBackgroundColor = "#1e293b"
+textColor = "#f1f5f9"
 font = "sans serif"
