@@ -7,12 +7,10 @@ matplotlib>=3.7.0
 scipy>=1.10.0
 openpyxl>=3.1.0
 python-dateutil>=2.8.0
-pyarrow>=12.0.0
 
 # AI/LLM integration
 openai>=1.0.0
 pyyaml>=6.0
 
-# Testing
-pytest>=7.4.0
-pytest-cov>=4.1.0
+# Optional: python-dotenv for local development
+python-dotenv>=1.0.0

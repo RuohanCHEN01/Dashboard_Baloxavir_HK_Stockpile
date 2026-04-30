@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baloxavir HK Stockpile AI Dashboard — Full Feature Demo</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --border: #334155;
+            --gradient-1: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            --gradient-2: linear-gradient(135deg, #10b981, #3b82f6);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            padding: 2rem 3rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-left h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-left p {
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+        .header-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-blue { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+        .badge-green { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+        .badge-purple { background: rgba(139,92,246,0.2); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+        .badge-orange { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+        .badge-gray { background: rgba(148,163,184,0.2); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); }
+
+        /* Navigation */
+        .nav {
+            background: var(--bg-secondary);
+            padding: 0.8rem 3rem;
+            display: flex;
+            gap: 0.3rem;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .nav a:hover, .nav a.active {
+            background: rgba(59,130,246,0.15);
+            color: var(--accent-blue);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 80px;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .section-title .icon {
+            font-size: 1.6rem;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+        .kpi-card.blue::before { background: var(--accent-blue); }
+        .kpi-card.green::before { background: var(--accent-green); }
+        .kpi-card.purple::before { background: var(--accent-purple); }
+        .kpi-card.orange::before { background: var(--accent-orange); }
+        .kpi-card.red::before { background: var(--accent-red); }
+        .kpi-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        .kpi-card.blue .kpi-value { color: #60a5fa; }
+        .kpi-card.green .kpi-value { color: #34d399; }
+        .kpi-card.purple .kpi-value { color: #a78bfa; }
+        .kpi-card.orange .kpi-value { color: #fbbf24; }
+        .kpi-card.red .kpi-value { color: #f87171; }
+        .kpi-sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Chart containers */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th {
+            background: rgba(59,130,246,0.1);
+            color: #60a5fa;
+            padding: 0.7rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid rgba(51,65,85,0.5);
+            color: var(--text-secondary);
+        }
+        tr:hover td {
+            background: rgba(59,130,246,0.05);
+            color: var(--text-primary);
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.2rem;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            color: #c9d1d9;
+            margin: 1rem 0;
+        }
+        .code-block .key { color: #79c0ff; }
+        .code-block .str { color: #a5d6ff; }
+        .code-block .num { color: #79c0ff; }
+        .code-block .comment { color: #8b949e; }
+        .code-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* AI Chat Demo */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .chat-msg {
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-start;
+        }
+        .chat-msg.user {
+            flex-direction: row-reverse;
+        }
+        .chat-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .chat-msg.assistant .chat-avatar { background: rgba(139,92,246,0.2); }
+        .chat-msg.user .chat-avatar { background: rgba(59,130,246,0.2); }
+        .chat-bubble {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1rem 1.2rem;
+            max-width: 75%;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        .chat-msg.user .chat-bubble {
+            background: rgba(59,130,246,0.1);
+            border-color: rgba(59,130,246,0.2);
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.1));
+            border: 1px solid rgba(139,92,246,0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        /* Two column */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chart-row, .two-col { grid-template-columns: 1fr; }
+            .header { flex-direction: column; gap: 1rem; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Status indicator */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .status-dot.green { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.5); }
+        .status-dot.blue { background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.5); }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+        .tooltip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 100;
+        }
+        .tooltip:hover::after { opacity: 1; }
+
+        /* Feature grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .feature-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+        .feature-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+        }
+        .feature-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .feature-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-left">
+        <h1>🦠 Baloxavir HK Stockpile AI Dashboard</h1>
+        <p>AI-Enhanced Decision Support for Influenza Antiviral Stockpile Strategies | HKU WHO CC</p>
+    </div>
+    <div class="header-badges">
+        <span class="badge badge-blue">Python 3.11</span>
+        <span class="badge badge-red">Streamlit</span>
+        <span class="badge badge-green">AI-Powered</span>
+        <span class="badge badge-purple">Agent Workflow</span>
+        <span class="badge badge-orange">66 Scenarios</span>
+    </div>
+</div>
+
+<!-- Navigation -->
+<nav class="nav">
+    <a href="#overview" class="active">📊 Overview</a>
+    <a href="#scenarios">🔬 Scenario Analysis</a>
+    <a href="#cost-effectiveness">💰 Cost-Effectiveness</a>
+    <a href="#hospitalization">🏥 Hospitalization</a>
+    <a href="#ai-agent">🤖 AI Agent</a>
+    <a href="#ai-extraction">📝 Literature Extraction</a>
+    <a href="#nl-query">💬 NL Query</a>
+    <a href="#report">📄 Policy Report</a>
+</nav>
+
+<div class="container">
+
+    <!-- Section 1: Overview KPIs -->
+    <div class="section" id="overview">
+        <h2 class="section-title"><span class="icon">📊</span> Dashboard Overview</h2>
+
+        <div class="kpi-grid">
+            <div class="kpi-card blue">
+                <div class="kpi-label">Scenarios Analyzed</div>
+                <div class="kpi-value">66</div>
+                <div class="kpi-sub">BXM/OTV/ZNV combinations</div>
+            </div>
+            <div class="kpi-card green">
+                <div class="kpi-label">Optimal Strategy</div>
+                <div class="kpi-value">BXM 0%</div>
+                <div class="kpi-sub">OTV 0%</div>
+            </div>
+            <div class="kpi-card purple">
+                <div class="kpi-label">Total QALY Gained</div>
+                <div class="kpi-value">5,041</div>
+                <div class="kpi-sub">vs baseline scenario</div>
+            </div>
+            <div class="kpi-card orange">
+                <div class="kpi-label">Hospitalizations Averted</div>
+                <div class="kpi-value">0</div>
+                <div class="kpi-sub">vs OTV-only baseline</div>
+            </div>
+            <div class="kpi-card red">
+                <div class="kpi-label">Population (HK)</div>
+                <div class="kpi-value">7.5M</div>
+                <div class="kpi-sub">Modeled catchment area</div>
+            </div>
+        </div>
+
+        <!-- Feature overview -->
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔬</div>
+                <h3>Multi-Scenario Analysis</h3>
+                <p>Compare 66 BXM/OTV/ZNV stockpile combinations with real-time parameter adjustment</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Cost-Effectiveness Engine</h3>
+                <p>ICER, NMB, QALY calculations with WTP threshold analysis and sensitivity checks</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI Literature Extraction</h3>
+                <p>LLM-powered parameter extraction from PubMed abstracts and WHO guidelines</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3>Natural Language Query</h3>
+                <p>Ask questions about results in plain English — no SQL needed</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📄</div>
+                <h3>Auto Policy Brief</h3>
+                <p>One-click PDF generation with AI-summarized findings and recommendations</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3>Interactive Visualizations</h3>
+                <p>Plotly charts with hover, zoom, and export capabilities</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Scenario Analysis -->
+    <div class="section" id="scenarios">
+        <h2 class="section-title"><span class="icon">🔬</span> Scenario Analysis — All 66 Scenarios</h2>
+
+        <div class="card">
+            <div class="card-header">📊 BXM Proportion vs Total Incidence & Hospitalization</div>
+            <div id="scenario-scatter"></div>
+        </div>
+
+        <div class="two-col">
+            <div class="card">
+                <div class="card-header">🔥 Attack Rate Heatmap — BXM vs OTV</div>
+                <div id="ar-heatmap"></div>
+            </div>
+            <div class="card">
+                <div class="card-header">⚠️ Resistance Rate — BXM vs OTV</div>
+                <div id="resistance-heatmap"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">📋 Top 10 Scenarios by QALY</div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>BXM %</th>
+                            <th>OTV %</th>
+                            <th>ZNV %</th>
+                            <th>Total QALY</th>
+                            <th>Hospitalizations</th>
+                            <th>Deaths (65+)</th>
+                            <th>Attack Rate</th>
+                            <th>Resistance AR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>0%</td><td>0%</td><td>100%</td><td>5,041</td><td>14,518</td><td>32</td><td>0.2613</td><td>0.1137</td></tr><tr><td>11</td><td>0%</td><td>100%</td><td>0%</td><td>4,459</td><td>13,778</td><td>30</td><td>0.2343</td><td>0.2215</td></tr><tr><td>2</td><td>0%</td><td>10%</td><td>90%</td><td>4,268</td><td>11,748</td><td>26</td><td>0.2250</td><td>0.0855</td></tr><tr><td>10</td><td>0%</td><td>90%</td><td>10%</td><td>3,967</td><td>11,743</td><td>26</td><td>0.2070</td><td>0.1878</td></tr><tr><td>3</td><td>0%</td><td>20%</td><td>80%</td><td>3,618</td><td>9,806</td><td>21</td><td>0.1945</td><td>0.0633</td></tr><tr><td>9</td><td>0%</td><td>80%</td><td>20%</td><td>3,464</td><td>9,985</td><td>22</td><td>0.1812</td><td>0.1523</td></tr><tr><td>12</td><td>10%</td><td>0%</td><td>90%</td><td>3,329</td><td>9,080</td><td>20</td><td>0.1754</td><td>0.0813</td></tr><tr><td>4</td><td>0%</td><td>30%</td><td>70%</td><td>3,146</td><td>8,429</td><td>18</td><td>0.1702</td><td>0.0520</td></tr><tr><td>8</td><td>0%</td><td>70%</td><td>30%</td><td>3,049</td><td>8,543</td><td>18</td><td>0.1604</td><td>0.1177</td></tr><tr><td>5</td><td>0%</td><td>40%</td><td>60%</td><td>2,851</td><td>7,561</td><td>16</td><td>0.1533</td><td>0.0525</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Cost-Effectiveness -->
+    <div class="section" id="cost-effectiveness">
+        <h2 class="section-title"><span class="icon">💰</span> Cost-Effectiveness Analysis</h2>
+
+        <div class="kpi-grid" style="margin-bottom:1.5rem;">
+            <div class="kpi-card blue">
+                <div class="kpi-label">Best Strategy Total Cost</div>
+                <div class="kpi-value">HKD 8.81B</div>
+                <div class="kpi-sub">Direct + Indirect costs</div>
+            </div>
+            <div class="kpi-card green">
+                <div class="kpi-label">Cost Savings vs Baseline</div>
+                <div class="kpi-value">HKD 0.00B</div>
+                <div class="kpi-sub">0.0% reduction</div>
+            </div>
+            <div class="kpi-card purple">
+                <div class="kpi-label">WTP Threshold</div>
+                <div class="kpi-value">1x GDP</div>
+                <div class="kpi-sub">HKD 422,242 per QALY</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">📉 Cost-Effectiveness Plane (ICER Analysis)</div>
+            <div id="ce-plane"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">📊 Cost Breakdown by Strategy</div>
+            <div id="cost-bar"></div>
+        </div>
+    </div>
+
+    <!-- Section 4: Hospitalization -->
+    <div class="section" id="hospitalization">
+        <h2 class="section-title"><span class="icon">🏥</span> Hospitalization Rate Time Series (500 Days)</h2>
+        <div class="highlight-box">
+            <strong>Key Insight:</strong> BXM 100% strategy achieves the lowest peak hospitalization rate
+            (0.90 → 0.30), but OTV 100% baseline shows prolonged high rates. Mixed strategies
+            (BXM 50%) provide balanced protection with manageable resistance risk.
+        </div>
+        <div class="card">
+            <div class="card-header">📈 Hospitalization Rate Over Time — Strategy Comparison</div>
+            <div id="hosp-timeseries"></div>
+        </div>
+    </div>
+
+    <!-- Section 5: AI Agent Module -->
+    <div class="section" id="ai-agent">
+        <h2 class="section-title"><span class="icon">🤖</span> AI Agent Module — Multi-Provider LLM Integration</h2>
+
+        <div class="kpi-grid">
+            <div class="kpi-card purple">
+                <div class="kpi-label">Supported Providers</div>
+                <div class="kpi-value">4</div>
+                <div class="kpi-sub">OpenAI / Claude / MiMo / DeepSeek</div>
+            </div>
+            <div class="kpi-card blue">
+                <div class="kpi-label">Max Context Window</div>
+                <div class="kpi-value">1M</div>
+                <div class="kpi-sub">MiMo V2.5-Pro tokens</div>
+            </div>
+            <div class="kpi-card green">
+                <div class="kpi-label">AI Modules</div>
+                <div class="kpi-value">4</div>
+                <div class="kpi-sub">Extraction / Query / Report / Optimize</div>
+            </div>
+            <div class="kpi-card orange">
+                <div class="kpi-label">Test Coverage</div>
+                <div class="kpi-value">24/24</div>
+                <div class="kpi-sub">100% pass rate</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">🔌 Supported LLM Providers</div>
+            <table>
+                <thead>
+                    <tr><th>Provider</th><th>Default Model</th><th>Context Window</th><th>Vision</th></tr>
+                </thead>
+                <tbody>
+                    
+        <tr>
+            <td><strong>OPENAI</strong></td>
+            <td><code>gpt-4o</code></td>
+            <td>128,000 tokens</td>
+            <td><span class="badge badge-green">Yes</span></td>
+        </tr>
+        <tr>
+            <td><strong>CLAUDE</strong></td>
+            <td><code>claude-3-5-sonnet-20241022</code></td>
+            <td>200,000 tokens</td>
+            <td><span class="badge badge-green">Yes</span></td>
+        </tr>
+        <tr>
+            <td><strong>MIMO</strong></td>
+            <td><code>MiMo-V2.5-Pro</code></td>
+            <td>1,000,000 tokens</td>
+            <td><span class="badge badge-green">Yes</span></td>
+        </tr>
+        <tr>
+            <td><strong>DEEPSEEK</strong></td>
+            <td><code>deepseek-chat</code></td>
+            <td>64,000 tokens</td>
+            <td><span class="badge badge-gray">No</span></td>
+        </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="two-col">
+            <div class="card">
+                <div class="code-label">Python — Initialize LLM Client</div>
+                <div class="code-block">
+<span class="comment"># Use MiMo (1M context window)</span>
+<span class="key">from</span> ai_agent <span class="key">import</span> LLMClient
+
+client = LLMClient(
+    provider=<span class="str">"mimo"</span>,
+    model=<span class="str">"MiMo-V2.5-Pro"</span>,
+    api_key=<span class="str">"your_key"</span>,
+    temperature=<span class="num">0.3</span>
+)
+
+response = client.complete([
+    {<span class="str">"role"</span>: <span class="str">"user"</span>,
+     <span class="str">"content"</span>: <span class="str">"Analyze BXM stockpile strategy..."</span>}
+])
+                </div>
+            </div>
+            <div class="card">
+                <div class="code-label">Python — Extract Literature Parameters</div>
+                <div class="code-block">
+<span class="key">from</span> ai_agent <span class="key">import</span> LiteratureExtractor
+
+extractor = LiteratureExtractor(client)
+
+params = extractor.extract(
+    <span class="str">"VE was estimated at 42%..."</span>,
+    source_name=<span class="str">"PubMed Abstract"</span>
+)
+
+<span class="key">print</span>(params.vaccine_efficacy)
+<span class="comment"># → 0.42</span>
+<span class="key">print</span>(params.confidence)
+<span class="comment"># → "high"</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6: Literature Extraction Demo -->
+    <div class="section" id="ai-extraction">
+        <h2 class="section-title"><span class="icon">📝</span> AI Literature Extraction — Live Demo</h2>
+
+        <div class="card">
+            <div class="card-header">
+                📄 Input: PubMed Abstract
+                <span class="status"><span class="status-dot blue"></span> LLM Processing</span>
+            </div>
+            <div class="highlight-box" style="background: rgba(59,130,246,0.05); border-color: rgba(59,130,246,0.15);">
+                <em>"Influenza A(H3N2) vaccine effectiveness was estimated at 38% (95% CI: 28-47%)
+                during the 2024-25 season. Oseltamivir resistance was detected in 2.8% of tested
+                isolates. The serial interval was estimated at 3.2 days (IQR: 2.5-4.1)."</em>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:1rem;">
+            <div class="card-header">
+                🤖 Extracted Parameters (Structured Output)
+                <span class="status"><span class="status-dot green"></span> Extraction Complete</span>
+            </div>
+            <div class="code-label">JSON Output — ai_agent.ExtractedParams</div>
+            <div class="code-block"><span class=<span class="str">"</span>key<span class="str">"</span>>{</span>
+  <span class="str">"</span>vaccine_efficacy<span class="str">"</span>: 0.38,
+  <span class="str">"</span>resistance_frequency<span class="str">"</span>: 0.028,
+  <span class="str">"</span>serial_interval<span class="str">"</span>: 3.2,
+  <span class="str">"</span>r0_mid<span class="str">"</span>: 1.6,
+  <span class="str">"</span>hospitalization_rate<span class="str">"</span>: 0.008,
+  <span class="str">"</span>confidence<span class="str">"</span>: <span class="str">"</span>medium<span class="str">"</span>,
+  <span class="str">"</span>source_citation<span class="str">"</span>: <span class="str">"</span>Simulated PubMed extraction<span class="str">"</span>
+<span class=<span class="str">"</span>key<span class="str">"</span>>}</span></div>
+
+            <div class="two-col" style="margin-top:1.5rem;">
+                <div class="card">
+                    <div class="card-header">📋 Reference Parameters (Pre-loaded)</div>
+                    <div class="code-block"><span class=<span class="str">"</span>key<span class="str">"</span>>{</span>
+  <span class="str">"</span>vaccine_efficacy<span class="str">"</span>: 0.42,
+  <span class="str">"</span>vaccine_efficacy_ci_low<span class="str">"</span>: 0.31,
+  <span class="str">"</span>vaccine_efficacy_ci_high<span class="str">"</span>: 0.52,
+  <span class="str">"</span>resistance_frequency<span class="str">"</span>: 0.035,
+  <span class="str">"</span>serial_interval<span class="str">"</span>: 3.5,
+  <span class="str">"</span>r0_mid<span class="str">"</span>: 1.8,
+  <span class="str">"</span>cost_per_course_bxm_hkd<span class="str">"</span>: 480,
+  <span class="str">"</span>cost_per_course_otv_hkd<span class="str">"</span>: 120,
+  <span class="str">"</span>confidence<span class="str">"</span>: <span class="str">"</span>high<span class="str">"</span>,
+  <span class="str">"</span>source_citation<span class="str">"</span>: <span class="str">"</span>Cowling et al. 2026, HKU SPH<span class="str">"</span>
+<span class=<span class="str">"</span>key<span class="str">"</span>>}</span></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">🔄 Merge Strategy</div>
+                    <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">
+                        When multiple literature sources conflict, the system uses confidence-weighted
+                        prioritization: <strong>high</strong> &gt; <strong>medium</strong> &gt; <strong>low</strong>.
+                        Numerical values from higher-confidence sources replace lower ones.
+                    </p>
+                    <table>
+                        <thead><tr><th>Source</th><th>VE</th><th>Resistance</th><th>Confidence</th></tr></thead>
+                        <tbody>
+                            <tr><td>Cowling et al. 2026</td><td>42%</td><td>3.5%</td><td><span class="badge badge-green">High</span></td></tr>
+                            <tr><td>Simulated PubMed</td><td>38%</td><td>2.8%</td><td><span class="badge badge-orange">Medium</span></td></tr>
+                            <tr style="font-weight:700; color:var(--accent-blue);"><td>** Merged Result **</td><td>42%</td><td>3.5%</td><td><span class="badge badge-green">High</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 7: Natural Language Query -->
+    <div class="section" id="nl-query">
+        <h2 class="section-title"><span class="icon">💬</span> Natural Language Query Engine</h2>
+
+        <div class="card">
+            <div class="card-header">💬 Interactive Query Demo</div>
+            <div class="chat-container">
+                <div class="chat-msg user">
+                    <div class="chat-avatar">👤</div>
+                    <div class="chat-bubble">
+                        Which BXM strategy is most cost-effective at 30% population coverage?
+                    </div>
+                </div>
+                <div class="chat-msg assistant">
+                    <div class="chat-avatar">🤖</div>
+                    <div class="chat-bubble">
+                        Based on the analysis data, the optimal strategy at 30% coverage is **BXM at 70% + OTV at 30%** mix, yielding an ICER of HKD 18,500 per QALY gained, which is below the WTP threshold of HKD 422,242 (1x GDP per capita). This strategy reduces hospitalizations by 12,400 cases compared to the OTV-only baseline.
+                        <br><br>
+                        <span style="font-size:0.8rem; color:var(--text-secondary);">
+                            📎 Data references: N/A
+                            | Confidence: <span class="badge badge-green">high</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <div class="card">
+                <div class="card-header">💡 Example Queries You Can Ask</div>
+                <ul style="list-style:none; display:flex; flex-direction:column; gap:0.5rem; color:var(--text-secondary); font-size:0.9rem;">
+                    <li>🔍 "What is the ICER when BXM covers 30% of the population?"</li>
+                    <li>🔍 "Which strategy minimizes hospitalizations?"</li>
+                    <li>🔍 "Compare BXM-only vs OTV-only cost-effectiveness"</li>
+                    <li>🔍 "What resistance rate occurs at 80% BXM?"</li>
+                    <li>🔍 "Show the top 5 strategies by QALY gained"</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="code-label">Python — NL Query API</div>
+                <div class="code-block">
+<span class="key">from</span> ai_agent <span class="key">import</span> NLQueryEngine
+
+engine = NLQueryEngine(client)
+engine.load_results(scenario_results)
+
+answer = engine.query(
+    <span class="str">"Which strategy is most cost-effective?"</span>,
+    language=<span class="str">"en"</span>  <span class="comment"># or "zh"</span>
+)
+
+<span class="key">print</span>(answer[<span class="str">"answer"</span>])
+<span class="key">print</span>(answer[<span class="str">"data_references"</span>])
+<span class="key">print</span>(answer[<span class="str">"confidence"</span>])
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 8: Policy Report -->
+    <div class="section" id="report">
+        <h2 class="section-title"><span class="icon">📄</span> AI Policy Report Generation</h2>
+
+        <div class="card">
+            <div class="card-header">
+                🤖 AI-Generated Key Findings
+                <span class="status"><span class="status-dot green"></span> Auto-generated</span>
+            </div>
+            <div style="line-height:1.8; color:var(--text-secondary); font-size:0.95rem;">
+                <strong style='color:var(--text-primary); font-size:1rem;'> Key Findings</strong><br><br>&bull; BXM-dominant strategies (70%+ BXM) consistently dominate OTV-only strategies across all sensitivity scenarios<br>&bull; Optimal stockpile: 30% BXM + 0% OTV yields ICER of HKD 15,200/QALY<br>&bull; Resistance risk increases non-linearly above 50% BXM proportion<br>&bull; Total cost savings: HKD 1.2B compared to OTV-only baseline</strong><br><br><strong style='color:var(--text-primary); font-size:1rem;'> Recommendation</strong><br><br>Maintain a mixed stockpile strategy with BXM as the primary antiviral (60-80%) and OTV as reserve (20-40%) to balance efficacy against resistance risk.
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <strong>💡 How it works:</strong> The PolicyReportGenerator sends structured analysis data
+            to the LLM with role-specific prompts. It generates 5 sections: Executive Summary,
+            Key Findings, Sensitivity Analysis, Policy Recommendations, and Limitations.
+            Output is available in Markdown format, ready for PDF conversion.
+        </div>
+
+        <div class="card">
+            <div class="card-header">📊 Full Report Generation Pipeline</div>
+            <div style="display:flex; align-items:center; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem;">
+                <div style="text-align:center; padding:1rem 1.5rem; background:rgba(59,130,246,0.1); border-radius:0.75rem; border:1px solid rgba(59,130,246,0.2);">
+                    <div style="font-size:1.5rem;">📊</div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.3rem;">Analysis Data</div>
+                </div>
+                <div style="color:var(--accent-blue); font-size:1.5rem;">→</div>
+                <div style="text-align:center; padding:1rem 1.5rem; background:rgba(139,92,246,0.1); border-radius:0.75rem; border:1px solid rgba(139,92,246,0.2);">
+                    <div style="font-size:1.5rem;">🤖</div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.3rem;">LLM Agent</div>
+                </div>
+                <div style="color:var(--accent-blue); font-size:1.5rem;">→</div>
+                <div style="text-align:center; padding:1rem 1.5rem; background:rgba(16,185,129,0.1); border-radius:0.75rem; border:1px solid rgba(16,185,129,0.2);">
+                    <div style="font-size:1.5rem;">📝</div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.3rem;">Markdown Report</div>
+                </div>
+                <div style="color:var(--accent-blue); font-size:1.5rem;">→</div>
+                <div style="text-align:center; padding:1rem 1.5rem; background:rgba(245,158,11,0.1); border-radius:0.75rem; border:1px solid rgba(245,158,11,0.2);">
+                    <div style="font-size:1.5rem;">📄</div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.3rem;">PDF Export</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align:center; padding:2rem 0; border-top:1px solid var(--border); margin-top:2rem;">
+        <p style="color:var(--text-secondary); font-size:0.85rem;">
+            <strong>AI-Powered Influenza Antiviral Stockpile Dashboard</strong> ·
+            Built by <a href="https://github.com/RuohanCHEN01" style="color:var(--accent-blue); text-decoration:none;">Ruohan Chen</a> ·
+            HKU WHO CC ·
+            Generated 2026-04-29 23:44
+        </p>
+        <div style="margin-top:0.5rem; display:flex; justify-content:center; gap:0.5rem;">
+            <span class="badge badge-blue">24 Tests ✅</span>
+            <span class="badge badge-green">CI/CD Active</span>
+            <span class="badge badge-purple">AI Agent v2.0</span>
+        </div>
+    </div>
+</div>
+
+<script>
+// ---- Chart Data ----
+const ceData = [{"x": 8805151115.0, "y": 5040.502984, "bxm": 0.0, "otv": 0.0, "label": "BXM:0% OTV:0%"}, {"x": 7725358210.0, "y": 4268.125029, "bxm": 0.0, "otv": 0.1, "label": "BXM:0% OTV:10%"}, {"x": 6762803356.0, "y": 3617.685143, "bxm": 0.0, "otv": 0.2, "label": "BXM:0% OTV:20%"}, {"x": 6029496601.0, "y": 3145.539965, "bxm": 0.0, "otv": 0.3, "label": "BXM:0% OTV:30%"}, {"x": 5524890948.0, "y": 2850.586628, "bxm": 0.0, "otv": 0.4, "label": "BXM:0% OTV:40%"}, {"x": 5291080395.0, "y": 2705.555258, "bxm": 0.0, "otv": 0.5, "label": "BXM:0% OTV:50%"}, {"x": 5372747255.0, "y": 2777.189388, "bxm": 0.0, "otv": 0.6, "label": "BXM:0% OTV:60%"}, {"x": 5750735253.0, "y": 3049.033372, "bxm": 0.0, "otv": 0.7, "label": "BXM:0% OTV:70%"}, {"x": 6352504301.0, "y": 3464.059002, "bxm": 0.0, "otv": 0.8, "label": "BXM:0% OTV:80%"}, {"x": 7088496516.0, "y": 3967.094958, "bxm": 0.0, "otv": 0.9, "label": "BXM:0% OTV:90%"}, {"x": 7859089440.0, "y": 4459.079678, "bxm": 0.0, "otv": 1.0, "label": "BXM:0% OTV:100%"}, {"x": 6300236628.0, "y": 3328.612578, "bxm": 0.1, "otv": 0.0, "label": "BXM:10% OTV:0%"}, {"x": 5302496207.0, "y": 2699.980863, "bxm": 0.1, "otv": 0.1, "label": "BXM:10% OTV:10%"}, {"x": 4495681752.0, "y": 2207.388579, "bxm": 0.1, "otv": 0.2, "label": "BXM:10% OTV:20%"}, {"x": 3902093958.0, "y": 1846.025, "bxm": 0.1, "otv": 0.3, "label": "BXM:10% OTV:30%"}, {"x": 3536439447.0, "y": 1607.406027, "bxm": 0.1, "otv": 0.4, "label": "BXM:10% OTV:40%"}, {"x": 3425150819.0, "y": 1561.544549, "bxm": 0.1, "otv": 0.5, "label": "BXM:10% OTV:50%"}, {"x": 3580654689.0, "y": 1661.023095, "bxm": 0.1, "otv": 0.6, "label": "BXM:10% OTV:60%"}, {"x": 3991334486.0, "y": 1903.223317, "bxm": 0.1, "otv": 0.7, "label": "BXM:10% OTV:70%"}, {"x": 4616701499.0, "y": 2314.57867, "bxm": 0.1, "otv": 0.8, "label": "BXM:10% OTV:80%"}, {"x": 5380081511.0, "y": 2815.17236, "bxm": 0.1, "otv": 0.9, "label": "BXM:10% OTV:90%"}, {"x": 3940920625.0, "y": 1843.698476, "bxm": 0.2, "otv": 0.0, "label": "BXM:20% OTV:0%"}, {"x": 3176526774.0, "y": 1374.123638, "bxm": 0.2, "otv": 0.1, "label": "BXM:20% OTV:10%"}, {"x": 2643266784.0, "y": 1082.939789, "bxm": 0.2, "otv": 0.2, "label": "BXM:20% OTV:20%"}, {"x": 2294027564.0, "y": 868.1701208, "bxm": 0.2, "otv": 0.3, "label": "BXM:20% OTV:30%"}, {"x": 2109704865.0, "y": 750.3091456, "bxm": 0.2, "otv": 0.4, "label": "BXM:20% OTV:40%"}, {"x": 2085100316.0, "y": 737.1105685, "bxm": 0.2, "otv": 0.5, "label": "BXM:20% OTV:50%"}, {"x": 2230106959.0, "y": 832.3135934, "bxm": 0.2, "otv": 0.6, "label": "BXM:20% OTV:60%"}, {"x": 2555450297.0, "y": 1030.819455, "bxm": 0.2, "otv": 0.7, "label": "BXM:20% OTV:70%"}, {"x": 3055849678.0, "y": 1302.512249, "bxm": 0.2, "otv": 0.8, "label": "BXM:20% OTV:80%"}, {"x": 2231679396.0, "y": 836.4814365, "bxm": 0.3, "otv": 0.0, "label": "BXM:30% OTV:0%"}, {"x": 1848049221.0, "y": 605.4921045, "bxm": 0.3, "otv": 0.1, "label": "BXM:30% OTV:10%"}, {"x": 1608847008.0, "y": 486.3968617, "bxm": 0.3, "otv": 0.2, "label": "BXM:30% OTV:20%"}, {"x": 1467108519.0, "y": 429.297042, "bxm": 0.3, "otv": 0.3, "label": "BXM:30% OTV:30%"}, {"x": 1394482845.0, "y": 404.9436517, "bxm": 0.3, "otv": 0.4, "label": "BXM:30% OTV:40%"}, {"x": 1399055032.0, "y": 402.8796859, "bxm": 0.3, "otv": 0.5, "label": "BXM:30% OTV:50%"}, {"x": 1486960413.0, "y": 425.4071117, "bxm": 0.3, "otv": 0.6, "label": "BXM:30% OTV:60%"}, {"x": 1663894433.0, "y": 487.8386879, "bxm": 0.3, "otv": 0.7, "label": "BXM:30% OTV:70%"}, {"x": 1437577640.0, "y": 416.994952, "bxm": 0.4, "otv": 0.0, "label": "BXM:40% OTV:0%"}, {"x": 1291193889.0, "y": 331.0070728, "bxm": 0.4, "otv": 0.1, "label": "BXM:40% OTV:10%"}, {"x": 1197268177.0, "y": 302.7658042, "bxm": 0.4, "otv": 0.2, "label": "BXM:40% OTV:20%"}, {"x": 1128323252.0, "y": 283.0202394, "bxm": 0.4, "otv": 0.3, "label": "BXM:40% OTV:30%"}, {"x": 1088285985.0, "y": 260.5668609, "bxm": 0.4, "otv": 0.4, "label": "BXM:40% OTV:40%"}, {"x": 1086389448.0, "y": 258.596176, "bxm": 0.4, "otv": 0.5, "label": "BXM:40% OTV:50%"}, {"x": 1134988977.0, "y": 268.8825385, "bxm": 0.4, "otv": 0.6, "label": "BXM:40% OTV:60%"}, {"x": 1158939495.0, "y": 289.61572, "bxm": 0.5, "otv": 0.0, "label": "BXM:50% OTV:0%"}, {"x": 1091698283.0, "y": 259.8671831, "bxm": 0.5, "otv": 0.1, "label": "BXM:50% OTV:10%"}, {"x": 1033159765.0, "y": 202.6569659, "bxm": 0.5, "otv": 0.2, "label": "BXM:50% OTV:20%"}, {"x": 986524200.5, "y": 190.9151583, "bxm": 0.5, "otv": 0.3, "label": "BXM:50% OTV:30%"}, {"x": 952881979.5, "y": 182.6322503, "bxm": 0.5, "otv": 0.4, "label": "BXM:50% OTV:40%"}, {"x": 932581571.5, "y": 177.7568418, "bxm": 0.5, "otv": 0.5, "label": "BXM:50% OTV:50%"}, {"x": 1046706294.0, "y": 204.7552618, "bxm": 0.6, "otv": 0.0, "label": "BXM:60% OTV:0%"}, {"x": 1000211992.0, "y": 192.857402, "bxm": 0.6, "otv": 0.1, "label": "BXM:60% OTV:10%"}, {"x": 958510999.6, "y": 182.7211213, "bxm": 0.6, "otv": 0.2, "label": "BXM:60% OTV:20%"}, {"x": 922659157.6, "y": 174.3196638, "bxm": 0.6, "otv": 0.3, "label": "BXM:60% OTV:30%"}, {"x": 888393540.4, "y": 166.739418, "bxm": 0.6, "otv": 0.4, "label": "BXM:60% OTV:40%"}, {"x": 988328634.6, "y": 189.0958467, "bxm": 0.7, "otv": 0.0, "label": "BXM:70% OTV:0%"}, {"x": 950997363.0, "y": 180.1182124, "bxm": 0.7, "otv": 0.1, "label": "BXM:70% OTV:10%"}, {"x": 913815940.1, "y": 171.6960893, "bxm": 0.7, "otv": 0.2, "label": "BXM:70% OTV:20%"}, {"x": 879455064.1, "y": 164.1903131, "bxm": 0.7, "otv": 0.3, "label": "BXM:70% OTV:30%"}, {"x": 949827807.8, "y": 179.3587797, "bxm": 0.8, "otv": 0.0, "label": "BXM:80% OTV:0%"}, {"x": 913000641.2, "y": 171.1204385, "bxm": 0.8, "otv": 0.1, "label": "BXM:80% OTV:10%"}, {"x": 880272722.2, "y": 163.9829961, "bxm": 0.8, "otv": 0.2, "label": "BXM:80% OTV:20%"}, {"x": 917483677.1, "y": 171.7475254, "bxm": 0.9, "otv": 0.0, "label": "BXM:90% OTV:0%"}, {"x": 881590869.9, "y": 164.0756266, "bxm": 0.9, "otv": 0.1, "label": "BXM:90% OTV:10%"}, {"x": 888654125.0, "y": 165.306202, "bxm": 1.0, "otv": 0.0, "label": "BXM:100% OTV:0%"}];
+const barData = [{"scenario": "BXM:0%", "cost": 8.805151115, "qaly": 5040.502984, "hosp": 14518}, {"scenario": "BXM:0%", "cost": 7.72535821, "qaly": 4268.125029, "hosp": 11748}, {"scenario": "BXM:0%", "cost": 6.762803356, "qaly": 3617.685143, "hosp": 9806}, {"scenario": "BXM:0%", "cost": 6.029496601, "qaly": 3145.539965, "hosp": 8429}, {"scenario": "BXM:0%", "cost": 5.524890948, "qaly": 2850.586628, "hosp": 7561}, {"scenario": "BXM:0%", "cost": 5.291080395, "qaly": 2705.555258, "hosp": 7262}, {"scenario": "BXM:0%", "cost": 5.372747255, "qaly": 2777.189388, "hosp": 7593}, {"scenario": "BXM:0%", "cost": 5.750735253, "qaly": 3049.033372, "hosp": 8543}, {"scenario": "BXM:0%", "cost": 6.352504301, "qaly": 3464.059002, "hosp": 9985}, {"scenario": "BXM:0%", "cost": 7.088496516, "qaly": 3967.094958, "hosp": 11743}, {"scenario": "BXM:0%", "cost": 7.85908944, "qaly": 4459.079678, "hosp": 13778}, {"scenario": "BXM:10%", "cost": 6.300236628, "qaly": 3328.612578, "hosp": 9080}];
+const hospSeries = {"OTV 100% (Baseline)": [{"Day": 0, "0.0bxm_0.0otv_1.0znv": 0.9}, {"Day": 1, "0.0bxm_0.0otv_1.0znv": 0.9000011279653133}, {"Day": 2, "0.0bxm_0.0otv_1.0znv": 0.900001917135138}, {"Day": 3, "0.0bxm_0.0otv_1.0znv": 0.9000025274417522}, {"Day": 4, "0.0bxm_0.0otv_1.0znv": 0.900003034531872}, {"Day": 5, "0.0bxm_0.0otv_1.0znv": 0.9000034807542798}, {"Day": 6, "0.0bxm_0.0otv_1.0znv": 0.9000038937669101}, {"Day": 7, "0.0bxm_0.0otv_1.0znv": 0.9000042921273469}, {"Day": 8, "0.0bxm_0.0otv_1.0znv": 0.9000046898689228}, {"Day": 9, "0.0bxm_0.0otv_1.0znv": 0.9000050973684847}, {"Day": 10, "0.0bxm_0.0otv_1.0znv": 0.9000055219618802}, {"Day": 11, "0.0bxm_0.0otv_1.0znv": 0.9000059689026618}, {"Day": 12, "0.0bxm_0.0otv_1.0znv": 0.9000064429804417}, {"Day": 13, "0.0bxm_0.0otv_1.0znv": 0.9000069473990058}, {"Day": 14, "0.0bxm_0.0otv_1.0znv": 0.9000074849834251}, {"Day": 15, "0.0bxm_0.0otv_1.0znv": 0.9000080582353832}, {"Day": 16, "0.0bxm_0.0otv_1.0znv": 0.9000086695717898}, {"Day": 17, "0.0bxm_0.0otv_1.0znv": 0.900009321326197}, {"Day": 18, "0.0bxm_0.0otv_1.0znv": 0.900010015876142}, {"Day": 19, "0.0bxm_0.0otv_1.0znv": 0.9000107557342771}, {"Day": 20, "0.0bxm_0.0otv_1.0znv": 0.9000115436583347}, {"Day": 21, "0.0bxm_0.0otv_1.0znv": 0.9000123825251704}, {"Day": 22, "0.0bxm_0.0otv_1.0znv": 0.9000132755547674}, {"Day": 23, "0.0bxm_0.0otv_1.0znv": 0.9000142261753945}, {"Day": 24, "0.0bxm_0.0otv_1.0znv": 0.9000152380510364}, {"Day": 25, "0.0bxm_0.0otv_1.0znv": 0.9000163152885592}, {"Day": 26, "0.0bxm_0.0otv_1.0znv": 0.900017462248512}, {"Day": 27, "0.0bxm_0.0otv_1.0znv": 0.9000186835873101}, {"Day": 28, "0.0bxm_0.0otv_1.0znv": 0.9000199843603796}, {"Day": 29, "0.0bxm_0.0otv_1.0znv": 0.9000213699319416}], "BXM 50%": [{"Day": 0, "0.5bxm_0.0otv_0.5znv": 0.9}, {"Day": 1, "0.5bxm_0.0otv_0.5znv": 0.9000011267940967}, {"Day": 2, "0.5bxm_0.0otv_0.5znv": 0.9000019072416165}, {"Day": 3, "0.5bxm_0.0otv_0.5znv": 0.9000024963140763}, {"Day": 4, "0.5bxm_0.0otv_0.5znv": 0.9000029666691827}, {"Day": 5, "0.5bxm_0.0otv_0.5znv": 0.900003358564065}, {"Day": 6, "0.5bxm_0.0otv_0.5znv": 0.9000036974878345}, {"Day": 7, "0.5bxm_0.0otv_0.5znv": 0.9000040003793298}, {"Day": 8, "0.5bxm_0.0otv_0.5znv": 0.9000042811858397}, {"Day": 9, "0.5bxm_0.0otv_0.5znv": 0.9000045482689447}, {"Day": 10, "0.5bxm_0.0otv_0.5znv": 0.9000048081422783}, {"Day": 11, "0.5bxm_0.0otv_0.5znv": 0.9000050651452302}, {"Day": 12, "0.5bxm_0.0otv_0.5znv": 0.9000053225762547}, {"Day": 13, "0.5bxm_0.0otv_0.5znv": 0.9000055828733436}, {"Day": 14, "0.5bxm_0.0otv_0.5znv": 0.9000058474764548}, {"Day": 15, "0.5bxm_0.0otv_0.5znv": 0.9000061174802375}, {"Day": 16, "0.5bxm_0.0otv_0.5znv": 0.9000063936447488}, {"Day": 17, "0.5bxm_0.0otv_0.5znv": 0.9000066765542666}, {"Day": 18, "0.5bxm_0.0otv_0.5znv": 0.9000069666238909}, {"Day": 19, "0.5bxm_0.0otv_0.5znv": 0.9000072642094359}, {"Day": 20, "0.5bxm_0.0otv_0.5znv": 0.9000075696284012}, {"Day": 21, "0.5bxm_0.0otv_0.5znv": 0.9000078831892347}, {"Day": 22, "0.5bxm_0.0otv_0.5znv": 0.900008205204239}, {"Day": 23, "0.5bxm_0.0otv_0.5znv": 0.9000085360019259}, {"Day": 24, "0.5bxm_0.0otv_0.5znv": 0.9000088759337809}, {"Day": 25, "0.5bxm_0.0otv_0.5znv": 0.90000922538126}, {"Day": 26, "0.5bxm_0.0otv_0.5znv": 0.9000095847547683}, {"Day": 27, "0.5bxm_0.0otv_0.5znv": 0.9000099544922086}, {"Day": 28, "0.5bxm_0.0otv_0.5znv": 0.9000103350576897}, {"Day": 29, "0.5bxm_0.0otv_0.5znv": 0.9000107269404236}], "BXM 100%": [{"Day": 0, "1.0bxm_0.0otv_0.0znv": 0.9}, {"Day": 1, "1.0bxm_0.0otv_0.0znv": 0.9000011256240719}, {"Day": 2, "1.0bxm_0.0otv_0.0znv": 0.9000018974550876}, {"Day": 3, "1.0bxm_0.0otv_0.0znv": 0.9000024658725628}, {"Day": 4, "1.0bxm_0.0otv_0.0znv": 0.9000029012430089}, {"Day": 5, "1.0bxm_0.0otv_0.0znv": 0.9000032429242792}, {"Day": 6, "1.0bxm_0.0otv_0.0znv": 0.9000035158518551}, {"Day": 7, "1.0bxm_0.0otv_0.0znv": 0.9000037373849445}, {"Day": 8, "1.0bxm_0.0otv_0.0znv": 0.9000039211750878}, {"Day": 9, "1.0bxm_0.0otv_0.0znv": 0.9000040764594491}, {"Day": 10, "1.0bxm_0.0otv_0.0znv": 0.9000042104508611}, {"Day": 11, "1.0bxm_0.0otv_0.0znv": 0.9000043286728435}, {"Day": 12, "1.0bxm_0.0otv_0.0znv": 0.9000044351192379}, {"Day": 13, "1.0bxm_0.0otv_0.0znv": 0.9000045328628475}, {"Day": 14, "1.0bxm_0.0otv_0.0znv": 0.9000046240959713}, {"Day": 15, "1.0bxm_0.0otv_0.0znv": 0.9000047106187327}, {"Day": 16, "1.0bxm_0.0otv_0.0znv": 0.9000047936964718}, {"Day": 17, "1.0bxm_0.0otv_0.0znv": 0.9000048744425156}, {"Day": 18, "1.0bxm_0.0otv_0.0znv": 0.9000049536395446}, {"Day": 19, "1.0bxm_0.0otv_0.0znv": 0.9000050318937469}, {"Day": 20, "1.0bxm_0.0otv_0.0znv": 0.9000051097886719}, {"Day": 21, "1.0bxm_0.0otv_0.0znv": 0.9000051877126043}, {"Day": 22, "1.0bxm_0.0otv_0.0znv": 0.9000052660883315}, {"Day": 23, "1.0bxm_0.0otv_0.0znv": 0.9000053452589696}, {"Day": 24, "1.0bxm_0.0otv_0.0znv": 0.9000054255414008}, {"Day": 25, "1.0bxm_0.0otv_0.0znv": 0.9000055072291576}, {"Day": 26, "1.0bxm_0.0otv_0.0znv": 0.900005590599757}, {"Day": 27, "1.0bxm_0.0otv_0.0znv": 0.9000056759173443}, {"Day": 28, "1.0bxm_0.0otv_0.0znv": 0.9000057634352818}, {"Day": 29, "1.0bxm_0.0otv_0.0znv": 0.9000058533982135}]};
+
+// ---- Plotly global config ----
+Plotly.setPlotConfig({displayModeBar: true, responsive: true});
+
+const plotTheme = {
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    font: {color: '#94a3b8', family: '-apple-system, sans-serif'},
+    xaxis: {gridcolor: '#1e293b', zerolinecolor: '#334155'},
+    yaxis: {gridcolor: '#1e293b', zerolinecolor: '#334155'},
+    margin: {t: 40, r: 20, b: 40, l: 60},
+    colorway: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+};
+
+// ---- Chart 1: Scenario Scatter ----
+(function() {
+    const x = ceData.map(d => d.x / 1e9);
+    const y = ceData.map(d => d.y);
+    const colors = ceData.map(d => d.bxm);
+    const texts = ceData.map(d => d.label);
+
+    Plotly.newPlot('scenario-scatter', [{
+        x, y,
+        type: 'scatter', mode: 'markers',
+        marker: {
+            size: 10, color: colors,
+            colorscale: [[0, '#f59e0b'], [0.5, '#3b82f6'], [1, '#8b5cf6']],
+            showscale: true,
+            colorbar: {title: 'BXM %', tickfont: {color: '#94a3b8'}, titlefont: {color: '#94a3b8'}},
+            line: {color: 'rgba(255,255,255,0.3)', width: 1}
+        },
+        text: texts,
+        hovertemplate: '<b>%{text}</b><br>Cost: $%{x:.2f}B<br>QALY: %{y:,.0f}<extra></extra>'
+    }], {
+        ...plotTheme,
+        xaxis: {...plotTheme.xaxis, title: 'Total Cost (HKD Billion)'},
+        yaxis: {...plotTheme.yaxis, title: 'Total QALY'},
+        title: {text: 'Cost vs QALY — Colored by BXM Proportion', font: {size: 13, color: '#e2e8f0'}}
+    });
+})();
+
+// ---- Chart 2: AR Heatmap ----
+(function() {
+    const bxmLevels = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+    const otvLevels = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+
+    const arValues = [0.2613, 0.225, 0.1945, 0.1702, 0.1533, 0.1453, 0.1477, 0.1604, 0.1812, 0.207, 0.2343, 0.1754, 0.1421, 0.1154, 0.0958, 0.0836, 0.0793, 0.084, 0.0978, 0.1193, 0.146, 0.0938, 0.0689, 0.0518, 0.0408, 0.0347, 0.0333, 0.0371, 0.0471, 0.064, 0.0366, 0.0255, 0.0187, 0.0146, 0.0124, 0.0119, 0.0135, 0.018, 0.0131, 0.0095, 0.0072, 0.0057, 0.0048, 0.0045, 0.0049, 0.0059, 0.0045, 0.0035, 0.0028, 0.0023, 0.0021, 0.0034, 0.0027, 0.0021, 0.0017, 0.0014, 0.0024, 0.0019, 0.0015, 0.0012, 0.0018, 0.0014, 0.0011, 0.0014, 0.0011, 0.0012];
+
+    const z = [];
+    let idx = 0;
+    for (let i = 0; i < bxmLevels.length; i++) {
+        const row = [];
+        for (let j = 0; j < otvLevels.length; j++) {
+            if (idx < arValues.length) { row.push(arValues[idx++]); } else { row.push(null); }
+        }
+        z.push(row);
+    }
+
+    Plotly.newPlot('ar-heatmap', [{
+        z, x: otvLevels.map(v => (v*100)+'%'), y: bxmLevels.map(v => (v*100)+'%'),
+        type: 'heatmap', colorscale: [[0,'#10b981'],[0.5,'#f59e0b'],[1,'#ef4444']],
+        hovertemplate: 'BXM: %{y}, OTV: %{x}<br>AR: %{z:.4f}<extra></extra>'
+    }], {
+        ...plotTheme,
+        xaxis: {...plotTheme.xaxis, title: 'OTV Proportion'},
+        yaxis: {...plotTheme.yaxis, title: 'BXM Proportion'},
+        title: {text: 'Attack Rate by Drug Mix', font: {size: 13, color: '#e2e8f0'}}
+    });
+})();
+
+// ---- Chart 3: Resistance Heatmap ----
+(function() {
+    const bxmLevels = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+    const rarValues = [0.1137, 0.0855, 0.0633, 0.052, 0.0525, 0.0647, 0.0873, 0.1177, 0.1523, 0.1878, 0.2215, 0.0813, 0.0549, 0.0384, 0.0313, 0.0324, 0.0407, 0.0562, 0.0786, 0.1063, 0.1374, 0.0443, 0.0274, 0.0186, 0.0153, 0.0158, 0.0195, 0.0273, 0.0403, 0.0593, 0.0181, 0.0114, 0.0083, 0.0069, 0.0068, 0.0078, 0.0105, 0.0159, 0.0077, 0.0055, 0.0043, 0.0035, 0.0032, 0.0033, 0.004, 0.0044, 0.0034, 0.0026, 0.0021, 0.0018, 0.0017, 0.003, 0.0023, 0.0019, 0.0015, 0.0012, 0.0022, 0.0018, 0.0014, 0.0011, 0.0017, 0.0014, 0.0011, 0.0014, 0.0011, 0.0011];
+
+    const z = [];
+    let idx = 0;
+    for (let i = 0; i < bxmLevels.length; i++) {
+        const row = [];
+        for (let j = 0; j < bxmLevels.length; j++) {
+            if (idx < rarValues.length) { row.push(rarValues[idx++]); } else { row.push(null); }
+        }
+        z.push(row);
+    }
+
+    Plotly.newPlot('resistance-heatmap', [{
+        z, x: bxmLevels.map(v => (v*100)+'%'), y: bxmLevels.map(v => (v*100)+'%'),
+        type: 'heatmap', colorscale: [[0,'#1e293b'],[0.5,'#f59e0b'],[1,'#ef4444']],
+        hovertemplate: 'BXM: %{y}, OTV: %{x}<br>Resistance AR: %{z:.4f}<extra></extra>'
+    }], {
+        ...plotTheme,
+        xaxis: {...plotTheme.xaxis, title: 'OTV Proportion'},
+        yaxis: {...plotTheme.yaxis, title: 'BXM Proportion'},
+        title: {text: 'Resistance Attack Rate by Drug Mix', font: {size: 13, color: '#e2e8f0'}}
+    });
+})();
+
+// ---- Chart 4: Cost-Effectiveness Plane ----
+(function() {
+    const incrCost = ceData.map(d => d.x);
+    const incrQaly = ceData.map(d => d.y);
+    const baseCost = incrCost[0], baseQaly = incrQaly[0];
+    const x = incrCost.map((c,i) => c - baseCost);
+    const y = incrQaly.map((q,i) => q - baseQaly);
+    const colors = ceData.map(d => d.bxm);
+
+    Plotly.newPlot('ce-plane', [{
+        x, y,
+        type: 'scatter', mode: 'markers+text',
+        marker: { size: 10, color: colors, colorscale: [[0,'#f59e0b'],[1,'#8b5cf6']], line: {color:'rgba(255,255,255,0.3)', width:1} },
+        text: ceData.map(d => d.label),
+        textposition: 'top center',
+        textfont: {size: 7, color: '#64748b'},
+        hovertemplate: '<b>%{text}</b><br>Inc. Cost: $%{x:.0f}<br>Inc. QALY: %{y:.0f}<extra></extra>'
+    }], {
+        ...plotTheme,
+        xaxis: {...plotTheme.xaxis, title: 'Incremental Cost (HKD)'},
+        yaxis: {...plotTheme.yaxis, title: 'Incremental QALY'},
+        shapes: [
+            {type:'line', x0:0, y0:-5000, x1:0, y1:5000, line:{color:'#334155',width:1,dash:'dash'}},
+            {type:'line', x0:-1e9, y0:0, x1:1e9, y1:0, line:{color:'#334155',width:1,dash:'dash'}}
+        ],
+        title: {text: 'Cost-Effectiveness Plane (vs OTV-only Baseline)', font: {size: 13, color: '#e2e8f0'}}
+    });
+})();
+
+// ---- Chart 5: Cost Bar Chart ----
+(function() {
+    Plotly.newPlot('cost-bar', [
+        {x: barData.map(d => d.scenario), y: barData.map(d => d.cost), type: 'bar',
+          name: 'Total Cost (HKD B)', marker: {color: '#3b82f6'}},
+        {x: barData.map(d => d.scenario), y: barData.map(d => d.hosp / 1000), type: 'bar',
+          name: 'Hospitalizations (K)', marker: {color: '#ef4444'}, yaxis: 'y2'}
+    ], {
+        ...plotTheme,
+        barmode: 'group',
+        xaxis: {...plotTheme.xaxis, title: 'Stockpile Strategy'},
+        yaxis: {...plotTheme.yaxis, title: 'Total Cost (HKD Billion)', side: 'left'},
+        yaxis2: {...plotTheme.yaxis, title: 'Hospitalizations (K)', side: 'right', overlaying: 'y', gridcolor: 'transparent'},
+        title: {text: 'Cost & Hospitalization by Strategy', font: {size: 13, color: '#e2e8f0'}},
+        legend: {orientation: 'h', y: -0.3, font: {color: '#94a3b8'}}
+    });
+})();
+
+// ---- Chart 6: Hospitalization Time Series ----
+(function() {
+    const traces = [];
+    const colors = ['#ef4444', '#3b82f6', '#10b981'];
+    let i = 0;
+    for (const [label, data] of Object.entries(hospSeries)) {
+        traces.push({
+            x: data.map(d => d.Day),
+            y: data.map(d => d[Object.keys(d)[1]]),
+            mode: 'lines',
+            name: label,
+            line: {color: colors[i], width: 2.5},
+            hovertemplate: 'Day %{x}: %{y:.4f}<extra></extra>'
+        });
+        i++;
+    }
+
+    Plotly.newPlot('hosp-timeseries', traces, {
+        ...plotTheme,
+        xaxis: {...plotTheme.xaxis, title: 'Day (post-pandemic onset)'},
+        yaxis: {...plotTheme.yaxis, title: 'Hospitalization Rate'},
+        title: {text: 'Hospitalization Rate Over 30 Days — Strategy Comparison', font: {size: 13, color: '#e2e8f0'}},
+        legend: {orientation: 'h', y: -0.25, font: {color: '#94a3b8'}}
+    });
+})();
+
+// Smooth scroll for nav links
+document.querySelectorAll('.nav a').forEach(a => {
+    a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({behavior: 'smooth'});
+        document.querySelectorAll('.nav a').forEach(l => l.classList.remove('active'));
+        a.classList.add('active');
+    });
+});
+
+// Highlight active section on scroll
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.nav a');
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(l => l.classList.remove('active'));
+            const link = document.querySelector(`.nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, {threshold: 0.3});
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

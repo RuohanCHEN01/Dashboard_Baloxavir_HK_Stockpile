@@ -8,7 +8,6 @@ Uses RAG-style retrieval over simulation results + LLM for answer synthesis.
 
 import json
 import logging
-from typing import Optional
 
 from .llm_interface import LLMClient
 
